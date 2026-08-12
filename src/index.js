@@ -19,11 +19,10 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Serve Mini App static files
+// Serve Mini App static files (both at root and /webapp)
 const webappDir = path.join(__dirname, '..', 'webapp');
+app.use(express.static(webappDir));
 app.use('/webapp', express.static(webappDir));
-// Also serve at root so Render's health check and direct URL visits work
-app.get('/', (req, res) => res.redirect('/webapp'));
 
 // API routes
 app.use('/api/products', productsRouter);
