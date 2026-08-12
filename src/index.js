@@ -41,18 +41,22 @@ if (process.env.BOT_TOKEN) {
 
   bot = createBot();
 
-  if (process.env.WEBHOOK_URL) {
-    // Webhook mode (production)
-    app.use('/webhook', webhookCallback(bot, 'express'));
-    console.log(`🔗 Webhook endpoint at /webhook`);
+  // Auto-detect: HTTPS WEBAPP_URL → webhook mode (production), else long polling (dev)
+  const webAppUrl = process.env.WEBAPP_URL || '';
+  const useWebhook = webAppUrl.startsWith('https://');
 
-    bot.api.setWebhook(`${process.env.WEBHOOK_URL}/webhook`).then(() => {
-      console.log('✅ Webhook registered');
+  if (useWebhook) {
+    // Webhook mode (production) — no 409 conflicts on redeploy
+    app.use('/webhook', webhookCallback(bot, 'express'));
+    console.log(`🔗 Webhook mode — listening at /webhook`);
+
+    bot.api.setWebhook(`${webAppUrl}/webhook`).then(() => {
+      console.log(`✅ Webhook registered: ${webAppUrl}/webhook`);
     }).catch(err => {
       console.error('❌ Failed to set webhook:', err.message);
     });
   } else {
-    // Long polling mode (development)
+    // Long polling mode (development only)
     bot.start({
       onStart: (botInfo) => {
         console.log(`🤖 Bot @${botInfo.username} started (long polling)`);
