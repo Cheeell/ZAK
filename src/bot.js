@@ -31,7 +31,7 @@ function createBot() {
     const url = getWebAppUrl();
     const opts = { parse_mode: 'Markdown' };
     if (isHttps(url)) {
-      opts.reply_markup = new InlineKeyboard().web_app('🛒 Open Store', url);
+      opts.reply_markup = new InlineKeyboard().webApp('🛒 Open Store', url);
     } else {
       // No button for local URLs — append link as text
       text += `\n\n🔗 Open in browser: ${url}`;
@@ -48,7 +48,7 @@ function createBot() {
       .text('🏷 Manage Products', 'admin_products');
     const opts = { parse_mode: 'Markdown' };
     if (isHttps(url)) {
-      kb.row().web_app('🌐 Admin Panel', url);
+      kb.row().webApp('🌐 Admin Panel', url);
       opts.reply_markup = kb;
     } else {
       opts.reply_markup = kb;
