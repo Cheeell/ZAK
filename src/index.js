@@ -1,0 +1,84 @@
+require('dotenv').config();
+
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+
+// Initialize database (runs schema on first require)
+require('./db');
+
+const productsRouter = require('./routes/products');
+const cartRouter = require('./routes/cart');
+const ordersRouter = require('./routes/orders');
+const adminRouter = require('./routes/admin');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// Serve Mini App static files
+app.use('/webapp', express.static(path.join(__dirname, '..', 'webapp')));
+
+// API routes
+app.use('/api/products', productsRouter);
+app.use('/api/cart', cartRouter);
+app.use('/api/orders', ordersRouter);
+app.use('/api/admin', adminRouter);
+
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Bot setup (optional — server runs fine without it for API/frontend dev)
+let bot = null;
+if (process.env.BOT_TOKEN) {
+  const { createBot } = require('./bot');
+  const { webhookCallback } = require('grammy');
+
+  bot = createBot();
+
+  if (process.env.WEBHOOK_URL) {
+    // Webhook mode (production)
+    app.use('/webhook', webhookCallback(bot, 'express'));
+    console.log(`🔗 Webhook endpoint at /webhook`);
+
+    bot.api.setWebhook(`${process.env.WEBHOOK_URL}/webhook`).then(() => {
+      console.log('✅ Webhook registered');
+    }).catch(err => {
+      console.error('❌ Failed to set webhook:', err.message);
+    });
+  } else {
+    // Long polling mode (development)
+    bot.start({
+      onStart: (botInfo) => {
+        console.log(`🤖 Bot @${botInfo.username} started (long polling)`);
+      }
+    }).catch(err => {
+      console.error('❌ Failed to start bot:', err.message);
+    });
+  }
+} else {
+  console.log('⚠️  BOT_TOKEN not set — bot disabled, running API only');
+}
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`\n🚀 Server running on http://localhost:${PORT}`);
+  console.log(`🛍 Mini App: http://localhost:${PORT}/webapp`);
+  console.log(`📡 API: http://localhost:${PORT}/api`);
+  console.log('');
+});
+
+// Graceful shutdown
+function shutdown() {
+  console.log('\n👋 Shutting down...');
+  if (bot) bot.stop();
+  process.exit(0);
+}
+
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);

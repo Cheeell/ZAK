@@ -1,0 +1,26 @@
+{
+  "name": "zak-merch-bot",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "seed": "node scripts/seed.js"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "merch",
+    "miniapp"
+  ],
+  "author": "",
+  "license": "ISC",
+  "description": "Telegram Mini App for selling YouTuber merch",
+  "dependencies": {
+    "better-sqlite3": "^11.10.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "grammy": "^1.45.1"
+  }
+}
