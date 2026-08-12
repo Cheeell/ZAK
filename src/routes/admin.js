@@ -2,6 +2,7 @@ const { Router } = require('express');
 const db = require('../db');
 const { telegramAuth, adminOnly } = require('../middleware/auth');
 const { getStats } = require('../bot');
+const autoSeed = require('../auto-seed');
 
 const router = Router();
 
@@ -38,6 +39,14 @@ router.get('/deliveries', (req, res) => {
   }));
 
   res.json(result);
+});
+
+// POST /api/admin/reseed — clear products and re-seed defaults
+router.post('/reseed', (req, res) => {
+  db.prepare('DELETE FROM products').run();
+  autoSeed();
+  const products = db.prepare('SELECT id, name, price, stock FROM products ORDER BY id').all();
+  res.json({ success: true, count: products.length, products });
 });
 
 module.exports = router;
