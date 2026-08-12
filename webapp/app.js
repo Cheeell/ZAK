@@ -1,4 +1,11 @@
-const { createApp, ref, reactive, computed, onMounted } = Vue;
+const { createApp, ref, reactive, computed, onMounted, onUpdated, nextTick } = Vue;
+
+// Refresh Lucide icons after Vue renders new DOM elements
+function refreshIcons() {
+  nextTick(() => {
+    if (window.lucide) lucide.createIcons();
+  });
+}
 
 // Telegram WebApp initialization
 const tg = window.Telegram?.WebApp;
@@ -363,7 +370,13 @@ const app = createApp({
       } else {
         await Promise.all([loadProducts(), loadCart()]);
       }
+
+      // Initial icon render
+      refreshIcons();
     });
+
+    // Re-render Lucide icons after every Vue DOM update
+    onUpdated(refreshIcons);
 
     // Watch view for MainButton (simple interval check)
     setInterval(updateMainButton, 300);

@@ -6,6 +6,7 @@
   <title>Merch Store</title>
   <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -15,16 +16,20 @@
       <!-- Catalog -->
       <div v-if="view === 'catalog'" class="view">
         <div class="header">
-          <h1>🛍 Merch Store</h1>
+          <h1><i data-lucide="shopping-bag"></i> Merch Store</h1>
           <button class="cart-btn" @click="view = 'cart'">
-            🛒 <span v-if="cart.items.length" class="badge">{{ cart.items.length }}</span>
+            <i data-lucide="shopping-cart"></i>
+            <span v-if="cart.items.length" class="badge">{{ cart.items.length }}</span>
           </button>
         </div>
 
-        <div v-if="loading" class="loading">Loading products...</div>
+        <div v-if="loading" class="loading">
+          <i data-lucide="loader-2" class="spin"></i> Loading products...
+        </div>
 
         <div v-else-if="products.length === 0" class="empty">
-          <p>😕 No products available yet.</p>
+          <i data-lucide="package-open" class="empty-icon"></i>
+          <p>No products available yet.</p>
         </div>
 
         <div v-else class="product-grid">
@@ -33,16 +38,19 @@
               <img :src="p.image_url" :alt="p.name" loading="lazy">
             </div>
             <div class="product-image placeholder" v-else>
-              📦
+              <i data-lucide="package"></i>
             </div>
             <div class="product-info">
               <h3>{{ p.name }}</h3>
               <p class="description" v-if="p.description">{{ p.description }}</p>
               <div class="product-footer">
                 <span class="price">${{ p.price.toFixed(2) }}</span>
-                <span class="stock" v-if="p.stock <= 5 && p.stock > 0">Only {{ p.stock }} left!</span>
+                <span class="stock" v-if="p.stock <= 5 && p.stock > 0">
+                  <i data-lucide="alert-circle"></i> Only {{ p.stock }} left!
+                </span>
                 <button class="add-btn" @click="addToCart(p)" :disabled="isInCart(p.id)">
-                  {{ isInCart(p.id) ? '✓ In Cart' : 'Add to Cart' }}
+                  <i :data-lucide="isInCart(p.id) ? 'check' : 'plus'"></i>
+                  {{ isInCart(p.id) ? 'In Cart' : 'Add' }}
                 </button>
               </div>
             </div>
@@ -53,12 +61,13 @@
       <!-- Cart -->
       <div v-if="view === 'cart'" class="view">
         <div class="header">
-          <button class="back-btn" @click="view = 'catalog'">← Back</button>
-          <h1>🛒 Cart</h1>
+          <button class="back-btn" @click="view = 'catalog'"><i data-lucide="arrow-left"></i> Back</button>
+          <h1><i data-lucide="shopping-cart"></i> Cart</h1>
         </div>
 
         <div v-if="cart.items.length === 0" class="empty">
-          <p>🛒 Your cart is empty.</p>
+          <i data-lucide="shopping-cart" class="empty-icon"></i>
+          <p>Your cart is empty.</p>
           <button class="primary-btn" @click="view = 'catalog'">Browse Products</button>
         </div>
 
@@ -71,12 +80,18 @@
               <h3>{{ item.name }}</h3>
               <p class="price">${{ item.price.toFixed(2) }}</p>
               <div class="quantity-controls">
-                <button @click="updateQuantity(item, item.quantity - 1)" :disabled="item.quantity <= 1">−</button>
+                <button @click="updateQuantity(item, item.quantity - 1)" :disabled="item.quantity <= 1">
+                  <i data-lucide="minus"></i>
+                </button>
                 <span>{{ item.quantity }}</span>
-                <button @click="updateQuantity(item, item.quantity + 1)" :disabled="item.quantity >= item.stock">+</button>
+                <button @click="updateQuantity(item, item.quantity + 1)" :disabled="item.quantity >= item.stock">
+                  <i data-lucide="plus"></i>
+                </button>
               </div>
             </div>
-            <button class="remove-btn" @click="removeFromCart(item)">✕</button>
+            <button class="remove-btn" @click="removeFromCart(item)">
+              <i data-lucide="x"></i>
+            </button>
           </div>
 
           <div class="cart-summary">
@@ -85,7 +100,7 @@
               <span class="total-amount">${{ cart.total.toFixed(2) }}</span>
             </div>
             <button class="primary-btn checkout-btn" @click="view = 'checkout'">
-              Proceed to Checkout
+              <i data-lucide="credit-card"></i> Checkout
             </button>
           </div>
         </div>
@@ -94,40 +109,40 @@
       <!-- Checkout -->
       <div v-if="view === 'checkout'" class="view">
         <div class="header">
-          <button class="back-btn" @click="view = 'cart'">← Back</button>
-          <h1>📦 Checkout</h1>
+          <button class="back-btn" @click="view = 'cart'"><i data-lucide="arrow-left"></i> Back</button>
+          <h1><i data-lucide="truck"></i> Checkout</h1>
         </div>
 
         <div v-if="orderSuccess" class="success-screen">
-          <div class="success-icon">✅</div>
+          <div class="success-icon"><i data-lucide="check-circle-2"></i></div>
           <h2>Order Placed!</h2>
           <p>Your order <strong>#{{ orderSuccess.id }}</strong> has been placed successfully.</p>
           <p class="success-detail">You'll be notified when it ships.</p>
           <button class="primary-btn" @click="view = 'catalog'; orderSuccess = null">
-            Continue Shopping
+            <i data-lucide="shopping-bag"></i> Continue Shopping
           </button>
         </div>
 
         <form v-else @submit.prevent="placeOrder" class="checkout-form">
           <div class="form-group">
-            <label for="name">Full Name</label>
+            <label for="name"><i data-lucide="user"></i> Full Name</label>
             <input id="name" v-model="checkout.name" required placeholder="John Doe">
           </div>
           <div class="form-group">
-            <label for="address">Street Address</label>
+            <label for="address"><i data-lucide="home"></i> Street Address</label>
             <input id="address" v-model="checkout.address" required placeholder="123 Main St">
           </div>
           <div class="form-group">
-            <label for="city">City, State, ZIP</label>
+            <label for="city"><i data-lucide="map-pin"></i> City, State, ZIP</label>
             <input id="city" v-model="checkout.city" required placeholder="New York, NY 10001">
           </div>
           <div class="form-group">
-            <label for="phone">Phone Number</label>
+            <label for="phone"><i data-lucide="phone"></i> Phone Number</label>
             <input id="phone" v-model="checkout.phone" type="tel" required placeholder="+1 234 567 8900">
           </div>
 
           <div class="order-summary">
-            <h3>Order Summary</h3>
+            <h3><i data-lucide="receipt"></i> Order Summary</h3>
             <div v-for="item in cart.items" :key="item.id" class="summary-item">
               <span>{{ item.name }} × {{ item.quantity }}</span>
               <span>${{ (item.price * item.quantity).toFixed(2) }}</span>
@@ -138,9 +153,12 @@
             </div>
           </div>
 
-          <div v-if="checkoutError" class="error-msg">{{ checkoutError }}</div>
+          <div v-if="checkoutError" class="error-msg">
+            <i data-lucide="alert-triangle"></i> {{ checkoutError }}
+          </div>
 
           <button type="submit" class="primary-btn place-order-btn" :disabled="placingOrder">
+            <i data-lucide="check"></i>
             {{ placingOrder ? 'Placing Order...' : `Place Order — $${cart.total.toFixed(2)}` }}
           </button>
         </form>
@@ -149,11 +167,12 @@
       <!-- My Orders -->
       <div v-if="view === 'myorders'" class="view">
         <div class="header">
-          <button class="back-btn" @click="view = 'catalog'">← Back</button>
-          <h1>📋 My Orders</h1>
+          <button class="back-btn" @click="view = 'catalog'"><i data-lucide="arrow-left"></i> Back</button>
+          <h1><i data-lucide="clipboard-list"></i> My Orders</h1>
         </div>
 
         <div v-if="myOrders.length === 0" class="empty">
+          <i data-lucide="inbox" class="empty-icon"></i>
           <p>No orders yet.</p>
         </div>
 
@@ -173,7 +192,7 @@
               <span class="order-total">${{ order.total.toFixed(2) }}</span>
             </div>
             <div v-if="order.tracking_number" class="tracking">
-              📦 Tracking: {{ order.tracking_number }}
+              <i data-lucide="package"></i> Tracking: {{ order.tracking_number }}
             </div>
           </div>
         </div>
@@ -185,25 +204,25 @@
       <!-- Admin Dashboard -->
       <div v-if="view === 'admin'" class="view">
         <div class="header">
-          <h1>🔧 Admin Panel</h1>
+          <h1><i data-lucide="settings"></i> Admin Panel</h1>
         </div>
 
         <div class="admin-menu">
           <button class="admin-card" @click="loadDeliveries(); view = 'deliveries'">
-            <span class="admin-icon">📦</span>
+            <span class="admin-icon"><i data-lucide="truck"></i></span>
             <span class="admin-label">Pending Deliveries</span>
             <span class="admin-count" v-if="stats.pendingOrders">{{ stats.pendingOrders }}</span>
           </button>
           <button class="admin-card" @click="loadAllProducts(); view = 'manage-products'">
-            <span class="admin-icon">🏷</span>
+            <span class="admin-icon"><i data-lucide="tags"></i></span>
             <span class="admin-label">Manage Products</span>
           </button>
           <button class="admin-card" @click="view = 'stats'">
-            <span class="admin-icon">📊</span>
+            <span class="admin-icon"><i data-lucide="bar-chart-3"></i></span>
             <span class="admin-label">Statistics</span>
           </button>
           <button class="admin-card" @click="loadAllOrders(); view = 'all-orders'">
-            <span class="admin-icon">📋</span>
+            <span class="admin-icon"><i data-lucide="clipboard-list"></i></span>
             <span class="admin-label">All Orders</span>
           </button>
         </div>
@@ -212,12 +231,13 @@
       <!-- Pending Deliveries -->
       <div v-if="view === 'deliveries'" class="view">
         <div class="header">
-          <button class="back-btn" @click="view = 'admin'">← Back</button>
-          <h1>📦 Pending Deliveries</h1>
+          <button class="back-btn" @click="view = 'admin'"><i data-lucide="arrow-left"></i> Back</button>
+          <h1><i data-lucide="truck"></i> Pending Deliveries</h1>
         </div>
 
         <div v-if="deliveries.length === 0" class="empty">
-          <p>✅ No pending deliveries!</p>
+          <i data-lucide="check-circle" class="empty-icon"></i>
+          <p>No pending deliveries!</p>
         </div>
 
         <div v-else>
@@ -227,18 +247,19 @@
               <span class="order-date">{{ formatDate(order.created_at) }}</span>
             </div>
             <div class="customer-info">
+              <i data-lucide="user"></i>
               <strong>{{ order.first_name || 'Unknown' }}</strong>
               <span v-if="order.username"> (@{{ order.username }})</span>
             </div>
-            <div class="delivery-address">📍 {{ order.shipping_address }}</div>
+            <div class="delivery-address"><i data-lucide="map-pin"></i> {{ order.shipping_address }}</div>
             <div class="delivery-items">
               <div v-for="item in order.items" :key="item.name" class="delivery-item-line">
                 {{ item.name }} × {{ item.quantity }} — ${{ (item.price_at_order * item.quantity).toFixed(2) }}
               </div>
             </div>
-            <div class="delivery-total">💰 ${{ order.total.toFixed(2) }}</div>
+            <div class="delivery-total"><i data-lucide="dollar-sign"></i> {{ order.total.toFixed(2) }}</div>
             <button class="ship-btn" @click="shipOrder(order)">
-              ✅ Mark as Shipped
+              <i data-lucide="check-circle"></i> Mark as Shipped
             </button>
           </div>
         </div>
@@ -247,12 +268,13 @@
       <!-- Manage Products -->
       <div v-if="view === 'manage-products'" class="view">
         <div class="header">
-          <button class="back-btn" @click="view = 'admin'">← Back</button>
-          <h1>🏷 Products</h1>
-          <button class="add-product-btn" @click="openProductForm()">+ Add</button>
+          <button class="back-btn" @click="view = 'admin'"><i data-lucide="arrow-left"></i> Back</button>
+          <h1><i data-lucide="tags"></i> Products</h1>
+          <button class="add-product-btn" @click="openProductForm()"><i data-lucide="plus"></i> Add</button>
         </div>
 
         <div v-if="allProducts.length === 0" class="empty">
+          <i data-lucide="package-open" class="empty-icon"></i>
           <p>No products yet. Add your first one!</p>
         </div>
 
@@ -262,12 +284,13 @@
               <h3>{{ p.name }}</h3>
               <p>${{ p.price.toFixed(2) }} · Stock: {{ p.stock }}</p>
               <span :class="p.active ? 'status-active' : 'status-inactive'">
+                <i :data-lucide="p.active ? 'check-circle' : 'x-circle'"></i>
                 {{ p.active ? 'Active' : 'Inactive' }}
               </span>
             </div>
             <div class="admin-product-actions">
-              <button class="edit-btn" @click="openProductForm(p)">✏️</button>
-              <button class="delete-btn" @click="deleteProduct(p)">🗑</button>
+              <button class="edit-btn" @click="openProductForm(p)"><i data-lucide="pencil"></i></button>
+              <button class="delete-btn" @click="deleteProduct(p)"><i data-lucide="trash-2"></i></button>
             </div>
           </div>
         </div>
@@ -278,33 +301,37 @@
             <h2>{{ editingProduct ? 'Edit Product' : 'Add Product' }}</h2>
             <form @submit.prevent="saveProduct">
               <div class="form-group">
-                <label>Name</label>
+                <label><i data-lucide="type"></i> Name</label>
                 <input v-model="productForm.name" required>
               </div>
               <div class="form-group">
-                <label>Description</label>
+                <label><i data-lucide="align-left"></i> Description</label>
                 <textarea v-model="productForm.description" rows="3"></textarea>
               </div>
               <div class="form-group">
-                <label>Price ($)</label>
+                <label><i data-lucide="dollar-sign"></i> Price ($)</label>
                 <input v-model.number="productForm.price" type="number" step="0.01" min="0" required>
               </div>
               <div class="form-group">
-                <label>Image URL</label>
+                <label><i data-lucide="image"></i> Image URL</label>
                 <input v-model="productForm.image_url" placeholder="https://...">
               </div>
               <div class="form-group">
-                <label>Stock</label>
+                <label><i data-lucide="package"></i> Stock</label>
                 <input v-model.number="productForm.stock" type="number" min="0" required>
               </div>
-              <div class="form-group">
+              <div class="form-group checkbox-group">
                 <label>
-                  <input type="checkbox" v-model="productForm.active"> Active
+                  <input type="checkbox" v-model="productForm.active">
+                  <span><i data-lucide="eye"></i> Active</span>
                 </label>
               </div>
               <div class="modal-actions">
                 <button type="button" class="secondary-btn" @click="showProductForm = false">Cancel</button>
-                <button type="submit" class="primary-btn">{{ editingProduct ? 'Update' : 'Create' }}</button>
+                <button type="submit" class="primary-btn">
+                  <i :data-lucide="editingProduct ? 'save' : 'plus'"></i>
+                  {{ editingProduct ? 'Update' : 'Create' }}
+                </button>
               </div>
             </form>
           </div>
@@ -314,35 +341,40 @@
       <!-- Stats -->
       <div v-if="view === 'stats'" class="view">
         <div class="header">
-          <button class="back-btn" @click="view = 'admin'">← Back</button>
-          <h1>📊 Statistics</h1>
+          <button class="back-btn" @click="view = 'admin'"><i data-lucide="arrow-left"></i> Back</button>
+          <h1><i data-lucide="bar-chart-3"></i> Statistics</h1>
         </div>
 
         <div class="stats-grid">
           <div class="stat-card">
+            <i data-lucide="dollar-sign" class="stat-icon"></i>
             <div class="stat-value">${{ stats.totalRevenue.toFixed(2) }}</div>
             <div class="stat-label">Total Revenue</div>
           </div>
           <div class="stat-card">
+            <i data-lucide="shopping-bag" class="stat-icon"></i>
             <div class="stat-value">{{ stats.totalOrders }}</div>
             <div class="stat-label">Total Orders</div>
           </div>
           <div class="stat-card">
+            <i data-lucide="clock" class="stat-icon"></i>
             <div class="stat-value">{{ stats.pendingOrders }}</div>
             <div class="stat-label">Pending</div>
           </div>
           <div class="stat-card">
+            <i data-lucide="truck" class="stat-icon"></i>
             <div class="stat-value">{{ stats.shippedOrders }}</div>
             <div class="stat-label">Shipped</div>
           </div>
           <div class="stat-card">
+            <i data-lucide="check-circle" class="stat-icon"></i>
             <div class="stat-value">{{ stats.deliveredOrders }}</div>
             <div class="stat-label">Delivered</div>
           </div>
         </div>
 
         <div class="top-products" v-if="stats.topProducts.length">
-          <h3>🏆 Top Products</h3>
+          <h3><i data-lucide="trophy"></i> Top Products</h3>
           <div v-for="(p, i) in stats.topProducts" :key="i" class="top-product-item">
             <span>{{ i + 1 }}. {{ p.name }}</span>
             <span>{{ p.count }} sold</span>
@@ -353,8 +385,8 @@
       <!-- All Orders -->
       <div v-if="view === 'all-orders'" class="view">
         <div class="header">
-          <button class="back-btn" @click="view = 'admin'">← Back</button>
-          <h1>📋 All Orders</h1>
+          <button class="back-btn" @click="view = 'admin'"><i data-lucide="arrow-left"></i> Back</button>
+          <h1><i data-lucide="clipboard-list"></i> All Orders</h1>
         </div>
 
         <div class="filter-bar">
@@ -366,6 +398,7 @@
         </div>
 
         <div v-if="allOrders.length === 0" class="empty">
+          <i data-lucide="inbox" class="empty-icon"></i>
           <p>No orders found.</p>
         </div>
 
@@ -376,6 +409,7 @@
               <span :class="'status status-' + order.status">{{ order.status }}</span>
             </div>
             <div class="customer-info">
+              <i data-lucide="user"></i>
               {{ order.first_name || 'Unknown' }}
               <span v-if="order.username">(@{{ order.username }})</span>
             </div>
@@ -389,8 +423,12 @@
               <span class="order-total">${{ order.total.toFixed(2) }}</span>
             </div>
             <div v-if="order.status === 'pending'" class="order-actions">
-              <button class="ship-btn small" @click="shipOrderFromList(order)">✅ Ship</button>
-              <button class="cancel-btn small" @click="cancelOrder(order)">✕ Cancel</button>
+              <button class="ship-btn small" @click="shipOrderFromList(order)">
+                <i data-lucide="check-circle"></i> Ship
+              </button>
+              <button class="cancel-btn small" @click="cancelOrder(order)">
+                <i data-lucide="x-circle"></i> Cancel
+              </button>
             </div>
           </div>
         </div>
@@ -400,14 +438,17 @@
     <!-- Bottom Nav (Customer) -->
     <nav v-if="!isAdmin" class="bottom-nav">
       <button :class="{ active: view === 'catalog' }" @click="view = 'catalog'">
-        <span>🛍</span><span>Shop</span>
+        <i data-lucide="shopping-bag"></i><span>Shop</span>
       </button>
       <button :class="{ active: view === 'cart' }" @click="view = 'cart'">
-        <span>🛒<span v-if="cart.items.length" class="nav-badge">{{ cart.items.length }}</span></span>
+        <span class="nav-icon-wrap">
+          <i data-lucide="shopping-cart"></i>
+          <span v-if="cart.items.length" class="nav-badge">{{ cart.items.length }}</span>
+        </span>
         <span>Cart</span>
       </button>
       <button :class="{ active: view === 'myorders' }" @click="loadMyOrders(); view = 'myorders'">
-        <span>📋</span><span>Orders</span>
+        <i data-lucide="clipboard-list"></i><span>Orders</span>
       </button>
     </nav>
   </div>
