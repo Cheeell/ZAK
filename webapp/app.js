@@ -21,6 +21,16 @@ const API_BASE = (() => {
   return window.location.origin + '/api';
 })();
 
+// Proxy VK images to bypass hotlink protection
+function proxyImg(url) {
+  if (!url) return '';
+  // Only proxy VK images (sun9-*.vkuserphoto.ru)
+  if (url.includes('vkuserphoto.ru') || url.includes('vk.com')) {
+    return API_BASE + '/image-proxy?url=' + encodeURIComponent(url);
+  }
+  return url;
+}
+
 // Check if admin mode from URL param or Telegram init data
 const urlParams = new URLSearchParams(window.location.search);
 const isAdminMode = urlParams.get('admin') === '1';
@@ -393,7 +403,7 @@ const app = createApp({
     setInterval(updateMainButton, 300);
 
     return {
-      view, loading, isAdmin,
+      view, loading, isAdmin, proxyImg,
       products, cart, checkout, placingOrder, checkoutError, orderSuccess, myOrders,
       stats, deliveries, allProducts, allOrders, orderFilter,
       showProductForm, editingProduct, productForm,

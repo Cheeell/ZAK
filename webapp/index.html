@@ -35,7 +35,7 @@
         <div v-else class="product-grid">
           <div v-for="p in products" :key="p.id" class="product-card">
             <div class="product-image" v-if="p.image_url">
-              <img :src="p.image_url" :alt="p.name" loading="lazy">
+              <img :src="proxyImg(p.image_url)" :alt="p.name" loading="lazy">
             </div>
             <div class="product-image placeholder" v-else>
               <i data-lucide="package"></i>
@@ -74,7 +74,7 @@
         <div v-else>
           <div v-for="item in cart.items" :key="item.id" class="cart-item">
             <div class="cart-item-image" v-if="item.image_url">
-              <img :src="item.image_url" :alt="item.name">
+              <img :src="proxyImg(item.image_url)" :alt="item.name">
             </div>
             <div class="cart-item-info">
               <h3>{{ item.name }}</h3>

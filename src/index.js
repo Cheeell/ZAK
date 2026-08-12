@@ -15,6 +15,7 @@ const productsRouter = require('./routes/products');
 const cartRouter = require('./routes/cart');
 const ordersRouter = require('./routes/orders');
 const adminRouter = require('./routes/admin');
+const imageProxyRouter = require('./routes/image-proxy');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,21 +24,22 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Serve Mini App static files (both at root and /webapp)
-const webappDir = path.join(__dirname, '..', 'webapp');
-app.use(express.static(webappDir));
-app.use('/webapp', express.static(webappDir));
-
-// API routes
+// API routes — mounted BEFORE static files
 app.use('/api/products', productsRouter);
 app.use('/api/cart', cartRouter);
 app.use('/api/orders', ordersRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/image-proxy', imageProxyRouter);
 
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+// Serve Mini App static files (both at root and /webapp)
+const webappDir = path.join(__dirname, '..', 'webapp');
+app.use(express.static(webappDir));
+app.use('/webapp', express.static(webappDir));
 
 // Bot setup (optional — server runs fine without it for API/frontend dev)
 let bot = null;
