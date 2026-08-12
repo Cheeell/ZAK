@@ -810,6 +810,35 @@ body {
   justify-content: center;
 }
 
+/* Reseed */
+.reseed-btn {
+  width: 100%;
+  margin-top: 16px;
+  padding: 12px;
+  background: var(--bg-secondary);
+  border: 1px dashed var(--text-hint);
+  border-radius: var(--radius);
+  color: var(--text-hint);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.reseed-btn:active {
+  color: var(--link);
+  border-color: var(--link);
+}
+
+.reseed-btn [data-lucide] {
+  width: 14px;
+  height: 14px;
+}
+
 /* Stats */
 .stats-grid {
   display: grid;

@@ -309,6 +309,17 @@ const app = createApp({
       }
     }
 
+    async function reseedProducts() {
+      if (!confirm('This will DELETE all products and load defaults. Continue?')) return;
+      try {
+        const data = await api('/admin/reseed', { method: 'POST' });
+        alert(`Done! ${data.count} products loaded.`);
+        await loadAllProducts();
+      } catch (err) {
+        alert('Failed: ' + err.message);
+      }
+    }
+
     // Admin: All Orders
     async function loadAllOrders() {
       try {
@@ -389,7 +400,7 @@ const app = createApp({
       loadProducts, loadCart, addToCart, updateQuantity, removeFromCart, isInCart,
       placeOrder, loadMyOrders,
       loadStats, loadDeliveries, shipOrder, shipOrderFromList, cancelOrder,
-      loadAllProducts, openProductForm, saveProduct, deleteProduct,
+      loadAllProducts, openProductForm, saveProduct, deleteProduct, reseedProducts,
       loadAllOrders, filteredOrders, formatDate
     };
   }
