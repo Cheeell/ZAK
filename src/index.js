@@ -7,6 +7,10 @@ const path = require('path');
 // Initialize database (runs schema on first require)
 require('./db');
 
+// Auto-seed products if database is empty
+const autoSeed = require('./auto-seed');
+autoSeed();
+
 const productsRouter = require('./routes/products');
 const cartRouter = require('./routes/cart');
 const ordersRouter = require('./routes/orders');
